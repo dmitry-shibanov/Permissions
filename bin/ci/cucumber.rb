@@ -28,18 +28,6 @@ Dir.chdir(working_directory) do
   FileUtils.rm_rf("reports")
   FileUtils.mkdir_p("reports")
 
-  Luffa.unix_command("make clean",
-                     {:pass_msg => "cleaned",
-                      :fail_msg => "could not clean"})
-
-  Luffa.unix_command("make app",
-                     {:pass_msg => "built app",
-                      :fail_msg => "could not build app"})
-
-
-  # Luffa.unix_command('export APP_LANG=ru')
-  # Luffa.unix_command('export APP_LOCALE=ru')
-
   xcode = RunLoop::Xcode.new
   RunLoop::CoreSimulator.terminate_core_simulator_processes
   device = RunLoop::Core.default_simulator(xcode)
@@ -63,11 +51,9 @@ Dir.chdir(working_directory) do
     instruments = RunLoop::Instruments.new
     options = {}
     match = RunLoop::Device.detect_device(options, xcode, simctl, instruments)
-    # RunLoop::CoreSimulator.set_locale(match, "ru")
-    # RunLoop::CoreSimulator.set_language(match, "ru")
     env_vars = {"DEVICE_TARGET" => match.udid}
     cucumber_args
-    exit_code = Luffa.unix_command(args.join(" "), {:exit_on_nonzero_status => false,
+    exit_code = Luffa.unix_command(args.join(" "), {:exit_on_nonzero_status => true,
                                                 :env_vars => env_vars})
   end
 end
